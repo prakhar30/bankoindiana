@@ -8,8 +8,10 @@
 7. Hitting `docker ps` after the above command will show us that we have successfully started a container with our image. 
 8. A `docker exec -it <container_name_or_id> <command> [args]` command lets us run a single command inside the docker container. The `-it` flag tells docker to run the command as an interactive tty(teletype) session.
 9. Hence to access the postgres console inside the docker container we run `docker exec -it postgresLatest psql -U root` . We can exit this console by `\q`
-10. To see the logs of the container we can use the `docker logs <container_name_or_id>` command. 
-11. We will use `TablePlus` DB GUI tool to interact with the DB to speed up things a little bit. Enter the basic details used during the setup and then connect to the database in the tool.
-12. Get the generated SQL from the snippet that we created in DB Diagram website in the tool and run the entire script to create the data base schema. On running it successfully and hitting refresh all tables should have been created. 
-13. Use the command `docker stop <container_name>` to stop the container.
-14. After stopping the command we will need to use `docker start <container_name>` to run the already created container again. 
+10. We can also use `docker exec -it postgresLatest /bin/sh <or /bin/bash>` to access the shell of the docker container. Use the `exit` command to leave the shell.
+11. To see the logs of the container we can use the `docker logs <container_name_or_id>` command. 
+12. We will use `TablePlus` DB GUI tool to interact with the DB to speed up things a little bit. Enter the basic details used during the setup and then connect to the database in the tool.
+13. Get the generated SQL from the snippet that we created in DB Diagram website in the tool and run the entire script to create the data base schema. On running it successfully and hitting refresh all tables should have been created. 
+14. Use the command `docker stop <container_name>` to stop the container.
+15. After stopping the command we will need to use `docker start <container_name>` to run the already created container again.
+16. Use the command `docker rm <container_name>` to completely remove the container.  
