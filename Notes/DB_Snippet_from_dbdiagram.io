@@ -1,5 +1,5 @@
 Table accounts as A {
-  id bigserial [pk] // primary key
+  id bigserial [pk]
   owner varchar [not null]
   balance bigint [not null]
   currency varchar [not null]
@@ -12,7 +12,7 @@ Table accounts as A {
 
 Table entries {
   id bigserial [pk]
-  account_id bigint [ref: > A.id] // foreign key
+  account_id bigint [ref: > A.id, not null] // foreign key
   amount bigint [not null, note: 'can be -ve or +ve']
   created_at timestamptz [not null, default: `now()`]
 
@@ -23,8 +23,8 @@ Table entries {
 
 Table transfers {
   id bigserial [pk]
-  from_account_id bigint [ref: > A.id]
-  to_account_id bigint [ref: > A.id]
+  from_account_id bigint [ref: > A.id, not null]
+  to_account_id bigint [ref: > A.id, not null]
   amount bigint [not null, note: 'must be +ve']
   created_at timestamptz [not null, default: `now()`]
 
