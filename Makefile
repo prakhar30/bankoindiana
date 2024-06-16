@@ -16,4 +16,7 @@ migrateup:
 migratedown:
 	migrate -path db/migration -database "postgresql://root:something_secret@localhost:5432/banko_indiana?sslmode=disable" -verbose down
 
-.PHONY: dockerpostgres postgres createdb dropdb migrateup migratedown
+sqlc:
+	sqlc generate
+
+.PHONY: dockerpostgres postgres createdb dropdb migrateup migratedown sqlc
