@@ -36,6 +36,8 @@ jobs:
         curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-arm64.tar.gz | tar xvz
         sudo mv migrate /usr/bin/migrate
         which migrate
+        echo /usr/bin/migrate $(ls -l /usr/bin/migrate)
+        echo /usr/bin/ $(ls -l /usr/bin/)
         echo migrate version: $(migrate -version)
 
     - name: Checkout code
