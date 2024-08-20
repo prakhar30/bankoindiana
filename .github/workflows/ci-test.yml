@@ -30,9 +30,6 @@ jobs:
       with:
         go-version: '1.22.2'
 
-    - name: Checkout code
-      uses: actions/checkout@v4
-
     - name: Install golang-migrate
       run: |
         echo "Current Architecture: $(dpkg --print-architecture)"
@@ -40,6 +37,9 @@ jobs:
         sudo mv migrate /usr/bin/migrate
         which migrate
         echo migrate version: $(migrate -version)
+
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Run DB migrations
       run: make migrateup
