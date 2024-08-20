@@ -32,13 +32,7 @@ jobs:
 
     - name: Install golang-migrate
       run: |
-        echo "Current Architecture: $(dpkg --print-architecture)"
-        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-arm64.tar.gz | tar xvz
-        sudo mv migrate /usr/bin/
-        which migrate
-        echo /usr/bin/migrate $(ls /usr/bin/migrate)
-        echo /usr/bin/ $(ls /usr/bin/)
-        echo migrate version: $(migrate -version)
+        go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@4.17.1
 
     - name: Checkout code
       uses: actions/checkout@v4
