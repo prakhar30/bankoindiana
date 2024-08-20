@@ -34,7 +34,7 @@ jobs:
       run: |
         echo "Current Architecture: $(dpkg --print-architecture)"
         curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-arm64.tar.gz | tar xvz
-        sudo mv migrate /usr/bin/migrate
+        sudo mv migrate /usr/bin/
         which migrate
         echo /usr/bin/migrate $(ls /usr/bin/migrate)
         echo /usr/bin/ $(ls /usr/bin/)
