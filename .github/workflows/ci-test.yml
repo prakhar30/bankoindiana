@@ -32,7 +32,7 @@ jobs:
 
     - name: Install golang-migrate
       run: |
-        go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@4.17.1
+        go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
     - name: Checkout code
       uses: actions/checkout@v4
