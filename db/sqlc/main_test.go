@@ -7,16 +7,18 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/prakhar30/bankoindiana/utils"
 )
 
 var testStore *Store
 
-const (
-	dbSource = "postgresql://root:something_secret@localhost:5432/banko_indiana?sslmode=disable"
-)
-
 func TestMain(m *testing.M) {
-	connPool, err := pgxpool.New(context.Background(), dbSource)
+	config, err := utils.LoadConfig("../../")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+
+	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}

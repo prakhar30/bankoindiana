@@ -7,15 +7,16 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/prakhar30/bankoindiana/api"
 	db "github.com/prakhar30/bankoindiana/db/sqlc"
-)
-
-const (
-	dbSource      = "postgresql://root:something_secret@localhost:5432/banko_indiana?sslmode=disable"
-	serverAddress = "localhost:8080"
+	"github.com/prakhar30/bankoindiana/utils"
 )
 
 func main() {
-	connPool, err := pgxpool.New(context.Background(), dbSource)
+	config, err := utils.LoadConfig(".")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+
+	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
@@ -23,7 +24,7 @@ func main() {
 	store := db.NewStore(connPool)
 	server := api.NewServer(store)
 
-	err = server.Start(serverAddress)
+	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}
