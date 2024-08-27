@@ -10,7 +10,7 @@ import (
 	"github.com/prakhar30/bankoindiana/utils"
 )
 
-var testStore *Store
+var testStore Store
 
 func TestMain(m *testing.M) {
 	config, err := utils.LoadConfig("../../")

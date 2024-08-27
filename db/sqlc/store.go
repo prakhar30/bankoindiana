@@ -7,25 +7,29 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Store struct {
+type Store interface {
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+	Querier
+}
+
+type DBStore struct {
 	*Queries
 	conn *pgxpool.Pool
 }
 
-func NewStore(connPool *pgxpool.Pool) *Store {
-	return &Store{
+func NewStore(connPool *pgxpool.Pool) Store {
+	return &DBStore{
 		Queries: New(connPool),
 		conn:    connPool,
 	}
 }
 
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *DBStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.conn.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
 
-	// q := store.WithTx(tx)
 	q := New(tx)
 	err = fn(q)
 	if err != nil {
@@ -54,7 +58,7 @@ type TransferTxResult struct {
 
 var txKey = struct{}{}
 
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *DBStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
