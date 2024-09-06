@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgconn"
 	db "github.com/prakhar30/bankoindiana/db/sqlc"
 )
 
@@ -27,6 +28,13 @@ func (server *Server) createAccount(ctx *gin.Context) {
 	}
 	account, err := server.store.CreateAccount(ctx, arg)
 	if err != nil {
+		if pqError, ok := err.(*pgconn.PgError); ok {
+			switch pqError.ConstraintName {
+			case "accounts_owner_fkey":
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
+				return
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
