@@ -9,7 +9,9 @@ import (
 )
 
 func createRandomAccount() (CreateAccountParams, Account, error) {
-	_, user, _ := createRandomUser()
+	hashedPassword, _ := utils.HashPassword(utils.RandomString(6))
+
+	_, user, _ := createRandomUser(hashedPassword)
 
 	arg := CreateAccountParams{
 		Owner:    user.Username,
