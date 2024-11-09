@@ -1,5 +1,9 @@
 # Deployment Notes
 
 1. Create a Dockerfile with all the necessary info. Important point to remember about EXPOSE port it, it doesn't really exposes the port, but just serves as a documentation purpose between the builder and the deployer.
-2. Once the docker file is setup, we will use the command `docker build -t bankoindiana:latest .` to build the app, supplying a tag using the -t argument. 
+2. Once the docker file is setup, we will use the command `docker build -t bankoindiana:latest .` to build the app, supplying a tag using the -t argument. Once the build is done, you can check the built images by running `docker images`.
 3. A multistage docker file is used to just copy the binary to the image, thereby massively reducing the size.
+4. To run the build image we will use the command `docker run --name bankoindiana -p 8080:8080 bankoindiana:latest` This will initially fail, as we have not copied the app.env file. A failed run will also leave a container trace, we can check that using `docker ps -a` command. To remove it we use `docker rm bankoindiana`
+5. Before building the new image need to remove the current one. And then build the new one. 
+6. To run the image in production mode, just add the -e flag to supply environment config, like `docker run --name bankoindiana -p 8080:8080 -e GIN_MODE=release bankoindiana:latest`
+7. On doing this, the server will start but when we send any request the connection will be refused. This is cause in the app.env file we are connecting to the DB using the localhost, however that is not the case as both app and db are 2 separate containers with their own network config. To verify this use `docker container inspect <name-of-container>` and check the network config there. We will notice that both have different IP addresses.
