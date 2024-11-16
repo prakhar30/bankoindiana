@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	pgtype "github.com/jackc/pgx/v5/pgtype"
+	uuid "github.com/google/uuid"
 	db "github.com/prakhar30/bankoindiana/db/sqlc"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -177,7 +177,7 @@ func (mr *MockStoreMockRecorder) GetEntry(ctx, id any) *gomock.Call {
 }
 
 // GetSession mocks base method.
-func (m *MockStore) GetSession(ctx context.Context, id pgtype.UUID) (db.Session, error) {
+func (m *MockStore) GetSession(ctx context.Context, id uuid.UUID) (db.Session, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSession", ctx, id)
 	ret0, _ := ret[0].(db.Session)

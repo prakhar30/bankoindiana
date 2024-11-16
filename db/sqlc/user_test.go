@@ -34,7 +34,7 @@ func TestCreateUser(t *testing.T) {
 	require.Equal(t, arg.FullName, user.FullName)
 
 	require.NotZero(t, user.CreatedAt)
-	require.True(t, user.PasswordChangedAt.Time.IsZero())
+	require.True(t, user.PasswordChangedAt.IsZero())
 }
 
 func TestGetUser(t *testing.T) {
@@ -52,5 +52,5 @@ func TestGetUser(t *testing.T) {
 	require.Equal(t, user.HashedPassword, fetchedUser.HashedPassword)
 	require.Equal(t, user.Email, fetchedUser.Email)
 	require.Equal(t, user.FullName, fetchedUser.FullName)
-	require.WithinDuration(t, user.CreatedAt.Time, fetchedUser.CreatedAt.Time, time.Second)
+	require.WithinDuration(t, user.CreatedAt, fetchedUser.CreatedAt, time.Second)
 }
