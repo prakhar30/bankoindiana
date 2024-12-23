@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/prakhar30/bankoindiana/utils"
 	"github.com/stretchr/testify/require"
 )
@@ -53,4 +54,20 @@ func TestGetUser(t *testing.T) {
 	require.Equal(t, user.Email, fetchedUser.Email)
 	require.Equal(t, user.FullName, fetchedUser.FullName)
 	require.WithinDuration(t, user.CreatedAt, fetchedUser.CreatedAt, time.Second)
+}
+
+func TestUpdateUserOnlyFullName(t *testing.T) {
+	hashedPassword, _ := utils.HashPassword(utils.RandomString(6))
+	_, oldUser, _ := createRandomUser(hashedPassword)
+	newFullName := utils.RandomOwner()
+
+	updatedUser, err := testStore.UpdateUser(context.Background(), UpdateUserParams{
+		Username: oldUser.Username,
+		FullName: pgtype.Text{String: newFullName, Valid: true},
+	})
+	require.NoError(t, err)
+	require.NotEqual(t, oldUser.FullName, updatedUser.FullName)
+	require.Equal(t, newFullName, updatedUser.FullName)
+	require.Equal(t, oldUser.Email, updatedUser.Email)
+	require.Equal(t, oldUser.HashedPassword, updatedUser.HashedPassword)
 }
