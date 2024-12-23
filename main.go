@@ -5,6 +5,9 @@ import (
 	"log"
 	"net"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
 	db "github.com/prakhar30/bankoindiana/db/sqlc"
 	"github.com/prakhar30/bankoindiana/gapi"
@@ -24,6 +27,8 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
+
+	runDBMigration(config.MigrationURL, config.DBSource)
 
 	store := db.NewStore(connPool)
 	runGPRCServer(config, store)
@@ -62,3 +67,16 @@ func runGPRCServer(config utils.Config, store db.Store) {
 // 		log.Fatal("cannot start server:", err)
 // 	}
 // }
+
+func runDBMigration(migrationURL string, dbSource string) {
+	migration, err := migrate.New(migrationURL, dbSource)
+	if err != nil {
+		log.Fatal("cannot create migration:", err)
+	}
+
+	if err := migration.Up(); err != nil {
+		log.Fatal("cannot run migration:", err)
+	}
+
+	log.Println("migration completed successfully")
+}
