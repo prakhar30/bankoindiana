@@ -8,3 +8,4 @@
 - jq is an excellent command line JSON processor `https://jqlang.github.io/jq/` which can be used to process json responses from stuff like AWS secret manager or something.
 - To make any file executable, like the wait-for.sh we need to use the `chmod +x wait-for.sh` command.
 - We can use the Go Statik library to bundle front end files in our BE binary. `https://github.com/rakyll/statik`
+- To write structured JSON logs, we are going to use a library called Zerolog, `https://github.com/rs/zerolog`

@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
-	"log"
 	"net"
+	"os"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -20,12 +23,16 @@ import (
 func main() {
 	config, err := utils.LoadConfig(".")
 	if err != nil {
-		log.Fatal("cannot load config:", err)
+		log.Fatal().Err(err).Msg("cannot load config")
+	}
+
+	if config.Environment == "development" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
 	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
-		log.Fatal("cannot connect to db:", err)
+		log.Fatal().Err(err).Msg("cannot connect to db")
 	}
 
 	runDBMigration(config.MigrationURL, config.DBSource)
@@ -37,22 +44,23 @@ func main() {
 func runGPRCServer(config utils.Config, store db.Store) {
 	server, err := gapi.NewServer(config, store)
 	if err != nil {
-		log.Fatal("Cannot create server:", err)
+		log.Fatal().Err(err).Msg("Cannot create server")
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcLogger := grpc.UnaryInterceptor(gapi.GrpcLogger)
+	grpcServer := grpc.NewServer(grpcLogger)
 	pb.RegisterSimpleBankServer(grpcServer, server)
 	reflection.Register(grpcServer)
 
 	listner, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
-		log.Fatal("cannot create listener:", err)
+		log.Fatal().Err(err).Msg("cannot create listener")
 	}
 
-	log.Printf("starting gRPC server on %s", listner.Addr().String())
+	log.Info().Str("port", listner.Addr().String()).Msg("started gRPC server")
 	err = grpcServer.Serve(listner)
 	if err != nil {
-		log.Fatal("cannot start gRPC server:", err)
+		log.Fatal().Err(err).Msg("cannot start gRPC server")
 	}
 }
 
@@ -71,12 +79,12 @@ func runGPRCServer(config utils.Config, store db.Store) {
 func runDBMigration(migrationURL string, dbSource string) {
 	migration, err := migrate.New(migrationURL, dbSource)
 	if err != nil {
-		log.Fatal("cannot create migration:", err)
+		log.Fatal().Err(err).Msg("cannot create migration")
 	}
 
 	if err := migration.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal("cannot run migration:", err)
+		log.Fatal().Err(err).Msg("cannot run migration")
 	}
 
-	log.Println("migration completed successfully")
+	log.Info().Msg("migration completed successfully")
 }
