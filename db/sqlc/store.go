@@ -8,6 +8,7 @@ import (
 )
 
 type Store interface {
+	CreateUserTx(ctx context.Context, arg CreateUserTxParams) (CreateUserTxResult, error)
 	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
 	Querier
 }
