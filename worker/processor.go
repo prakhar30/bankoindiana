@@ -7,6 +7,11 @@ import (
 	db "github.com/prakhar30/bankoindiana/db/sqlc"
 )
 
+const (
+	QueueCritical = "critical"
+	QueueDefault  = "default"
+)
+
 // this will pick up the task from the redis queue and process it
 
 type TaskProcessor interface {
@@ -20,7 +25,12 @@ type RedisTaskProcessor struct {
 }
 
 func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) TaskProcessor {
-	server := asynq.NewServer(redisOpt, asynq.Config{})
+	server := asynq.NewServer(redisOpt, asynq.Config{
+		Queues: map[string]int{
+			QueueCritical: 10,
+			QueueDefault:  5,
+		},
+	})
 	return &RedisTaskProcessor{server: server, store: store}
 }
 

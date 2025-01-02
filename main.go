@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
@@ -16,6 +17,7 @@ import (
 	"github.com/prakhar30/bankoindiana/gapi"
 	"github.com/prakhar30/bankoindiana/pb"
 	"github.com/prakhar30/bankoindiana/utils"
+	"github.com/prakhar30/bankoindiana/worker"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -37,12 +39,19 @@ func main() {
 
 	runDBMigration(config.MigrationURL, config.DBSource)
 
+	redisOption := asynq.RedisClientOpt{
+		Addr: config.RedisAddress,
+	}
+
+	taskDistributor := worker.NewRedisTaskDistributor(redisOption)
+
 	store := db.NewStore(connPool)
-	runGPRCServer(config, store)
+	go runTaskProcessor(redisOption, store)
+	runGPRCServer(config, store, taskDistributor)
 }
 
-func runGPRCServer(config utils.Config, store db.Store) {
-	server, err := gapi.NewServer(config, store)
+func runGPRCServer(config utils.Config, store db.Store, taskDistributor worker.TaskDistributor) {
+	server, err := gapi.NewServer(config, store, taskDistributor)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot create server")
 	}
@@ -61,6 +70,15 @@ func runGPRCServer(config utils.Config, store db.Store) {
 	err = grpcServer.Serve(listner)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start gRPC server")
+	}
+}
+
+func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+	log.Info().Msg("starting task processor")
+	err := taskProcessor.Start()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to start task processor")
 	}
 }
 
