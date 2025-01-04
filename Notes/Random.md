@@ -9,3 +9,11 @@
 - To make any file executable, like the wait-for.sh we need to use the `chmod +x wait-for.sh` command.
 - We can use the Go Statik library to bundle front end files in our BE binary. `https://github.com/rakyll/statik`
 - To write structured JSON logs, we are going to use a library called Zerolog, `https://github.com/rs/zerolog`
+- We have modified the VS code settings for `go test flag` to 
+```
+"go.testFlags": [
+        "-v",
+        "-count=1",
+    ]
+```
+so that we run the tests with verbose logs and never caching the tests, which is something that VS code does, annoyingly.

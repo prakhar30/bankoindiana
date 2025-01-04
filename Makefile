@@ -22,6 +22,9 @@ migratedown:
 migratedown1:
 	migrate -path db/migration -database "postgresql://root:something_secret@localhost:5432/banko_indiana?sslmode=disable" -verbose down 1
 
+new_migration:
+	migrate create -ext sql -dir db/migration -seq $(name)
+
 sqlc:
 	sqlc generate
 
@@ -49,4 +52,4 @@ redis:
 redis-ping:
 	docker exec -it redis redis-cli ping
 
-.PHONY: dockerpostgres postgres createdb dropdb migrateup migrateup1 migratedown migratedown1 sqlc test server mock proto evans redis redis-ping
+.PHONY: dockerpostgres postgres createdb dropdb migrateup migrateup1 migratedown migratedown1 sqlc test server mock proto evans redis redis-ping new_migration
