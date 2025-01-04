@@ -7,6 +7,8 @@ import (
 	"fmt"
 
 	"github.com/hibiken/asynq"
+	db "github.com/prakhar30/bankoindiana/db/sqlc"
+	"github.com/prakhar30/bankoindiana/utils"
 	"github.com/rs/zerolog/log"
 )
 
@@ -50,7 +52,20 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 		return fmt.Errorf("failed to get user %w", err)
 	}
 
+	verifyEmail, err := processor.store.CreateVerifyEmail(ctx, db.CreateVerifyEmailParams{
+		Username:   user.Username,
+		Email:      user.Email,
+		SecretCode: utils.RandomString(32),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create verify email %w", err)
+	}
+
 	// TODO: send email to user.Email with verification link
-	log.Info().Str("type", task.Type()).Bytes("payload", task.Payload()).Str("username", user.Username).Str("email", user.Email).Msg("sending verification email")
+	// Imagine there exisits a function sendEmail with the processor to send email.
+	// For this project, we will skip the email sending part and pick up the secret code directly from the DB.
+	// Or attaching it in the log here. This is just for the sake of simplicity.
+
+	log.Info().Str("type", task.Type()).Int("secret_code_id", int(verifyEmail.ID)).Str("secret_code", verifyEmail.SecretCode).Bytes("payload", task.Payload()).Str("username", user.Username).Str("email", user.Email).Msg("sending verification email")
 	return nil
 }
