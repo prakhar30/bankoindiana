@@ -18,3 +18,4 @@
 ```
 so that we run the tests with verbose logs and never caching the tests, which is something that VS code does, annoyingly.
 - To update go version in the project, it needs to reflect in 2 places - Dockerfile, should specify the correct image, and the go.mod file. Then go mod tidy to resolve any dependencies. Also in the ci-test.yml for the Github test workflow.
+- Can use `go env GOPATH` to check where the go bin and other folders are located.
