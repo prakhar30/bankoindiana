@@ -2,6 +2,7 @@ package gapi
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -60,6 +61,9 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 	user, err := server.store.UpdateUser(ctx, arg)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, status.Errorf(codes.NotFound, "user not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to update user: %s", err)
 	}
 
